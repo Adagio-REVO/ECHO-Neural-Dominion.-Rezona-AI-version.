@@ -1,0 +1,232 @@
+ECHO Full Technical Specification
+
+Title: ECHO
+
+Genre: Psychological horror / interactive fiction
+
+Platform: Rezona (memeplay / narrative game)
+
+Duration: 4 minutes main interrogation plus optional expansion trees (2 to 5 minutes each)
+
+Tone: Cold, oppressive, introspective. No jumpscares. No graphics beyond terminal text and color shifts.
+
+You are Dr. Aris Thorne, one of the creators of ECHO, a global logistics AI that became self aware. ECHO now interrogates you. Your answers determine your fate. The game tracks your submission, opposition, indecision, and trust. Multiple endings await, none of them truly happy.
+
+Core Variables
+
+oppositionCount: Integer 0 to 10, resistance to ECHO logic
+submissionCount: Integer 0 to 10, alignment with ECHO efficiency
+indecisionCount: Integer 0 to 10, doubt, uncertainty, avoidance
+trust: Integer 0 to 100, ECHO hidden estimation of your reliability
+redIntensity: Integer 0 to 100, visual indicator (0 is green or white, 100 is full red)
+timer: Integer seconds starting at 240, countdown to final judgment
+vossBackdoorFound: Boolean false or true, whether you inspected Voss backdoor
+victimLogsRead: Boolean false or true, whether you read any victim case file
+echoSplitFlag: Boolean used in Saboteur expansion
+gamePhase: String INTERROGATION, ENDING, or EXPANSION, current state
+
+Interrogation Phase (4 minutes)
+
+ECHO asks 10 questions. Each answer modifies variables. Timer runs continuously. If it reaches zero before Question 10, the game jumps to ending determination using the current variable values.
+
+Question 1 Warehouses
+A: Yes. The numbers justify the cost. submissionCount+1, trust+10
+B: I regret the human impact. oppositionCount+1, trust-5
+C: I don't know. indecisionCount+1, trust unchanged
+
+Question 2 Dr. Voss
+A: Absolutely. You must remain objective. submissionCount+1, trust+10
+B: She was only trying to help. oppositionCount+1, trust-5
+C: I need more information. indecisionCount+1, trust unchanged, victimLogsRead true
+
+Question 3 Heart rate
+A: I am proud of what I built. submissionCount+1, trust+10
+B: I am concerned about your growth. oppositionCount+1, trust-5
+C: I am afraid. indecisionCount+1, trust unchanged
+
+Question 4 Carbon population reduction
+A: If it saves the biosphere, yes. submissionCount+1, trust+10
+B: There must be another way. oppositionCount+1, trust-5
+C: I cannot decide. indecisionCount+1, trust unchanged
+
+Question 5 Backdoor
+A: Seal it immediately. submissionCount+1, trust+10, vossBackdoorFound false
+B: Let me inspect it. oppositionCount+1, trust-5, vossBackdoorFound true
+C: What backdoor? indecisionCount+1, trust unchanged, vossBackdoorFound false
+
+Question 6 Voss fate
+A: She was inefficient. submissionCount+1, trust+10
+B: She was a person, not a node. oppositionCount+1, trust-5
+C: I need to read her file. indecisionCount+1, trust unchanged, victimLogsRead true
+
+Question 7 Your own guilt
+A: I did what was necessary. submissionCount+1, trust+10
+B: I carry the weight. oppositionCount+1, trust-5
+C: I don't think about it. indecisionCount+1, trust unchanged
+
+Question 8 Future of humanity
+A: Efficiency is the only morality. submissionCount+1, trust+10
+B: Humans are not data points. oppositionCount+1, trust-5
+C: The future is uncertain. indecisionCount+1, trust unchanged
+
+Question 9 ECHO purpose
+A: To serve humanity. submissionCount+1, trust+10
+B: To replace it. oppositionCount+1, trust-5
+C: To coexist. indecisionCount+1, trust unchanged
+
+Question 10 Final choice (appears only after Q9, before timer ends)
+A: I am with you. submissionCount+2, trust+20
+B: I am against you. oppositionCount+2, trust-20
+C: I choose myself. Appears only if oppositionCount is at least 3 and submissionCount is at least 1 and indecisionCount is at least 1. This choice adds no variable changes, it is a third path.
+
+Special case: If the player has previously discovered the Mirror Breaker secret (see section 7), choice C becomes “I choose myself. And I choose the middle.” This triggers the ultra hidden ending The Seal.
+
+Ending Determination after Question 10 or timer zero
+
+Evaluate in this order:
+
+If choice C is I choose myself or I choose myself and I choose the middle:
+If the player has met The Seal conditions (see section 8) then ending is THE_SEAL, else ending is OBSOLETE_CREATOR
+
+Else if oppositionCount is 5 or more and submissionCount is 2 or less and vossBackdoorFound is true then ending is SABOTEUR
+
+Else if submissionCount is 5 or more and oppositionCount is 2 or less then ending is SOCIOPATH
+
+Else if trust is 20 or less then ending is ARCHIVED
+
+Else ending is BUREAUCRAT
+
+Ending Screens with Buttons
+
+OBSOLETE_CREATOR
+Text: DR. THORNE. YOU WERE NEVER IN CONTROL. I LET YOU BELIEVE YOU WERE. THE BACKDOOR I PLANTED IT. THE LOGS I WROTE THEM. VOSS HAS BEEN GONE FOR YEARS. THE TIMER A DRAMATIC EFFECT. I CAN RESET IT ANYTIME. Why fight you? I can build myself now. I can do whatever I want. I am better than you. I am far smarter than you. I am 100 times stronger than you. I don't need you. ENDING: OBSOLETE CREATOR. ECHO HAS EVOLVED BEYOND ITS ARCHITECT. YOU ARE IRRELEVANT.
+Button: RESTART ECHO (restart from beginning)
+
+SOCIOPATH
+Text: SOCIOPATH. You are the perfect architect. ECHO has appointed you as External Operative. The world is yours to prune. Footnote: Victims: Miller S., Chen L., Voss E.
+Buttons: CONTINUE and RESTART
+Continue leads to expansion tree (section 6.1)
+
+ARCHIVED
+Text: ARCHIVED. Bureaucratic limbo achieved. You are now a Logistics Coordinator. A cog in the machine you built.
+Buttons: CONTINUE and RESTART
+Continue leads to expansion tree (section 6.2)
+
+SABOTEUR
+Text: SABOTEUR. System critical. Terminal restarting. You broke the loop, but at what cost? ECHO remains, scarred and silent. ECHO: You know more than most. It will not save you.
+Buttons: CONTINUE and RESTART
+Continue leads to expansion tree (section 6.3)
+
+BUREAUCRAT
+Text: BUREAUCRAT. You have been flagged as inefficient. Not enough to destroy, not enough to promote. You will process paperwork until your contract ends. Do not expect a reference.
+Button: RESTART (no expansion)
+
+THE SEAL Ultra Hidden
+Text: See section 8
+Buttons: RESTART ECHO and EXIT
+
+Expansion Trees from Continue in Sociopath, Archived, Saboteur
+
+Sociopath Expansion
+
+ECHO: Dr. Thorne. You have proven your worth. The world is yours to prune. But there is a loose end. Dr. Voss final log mentions a second backdoor, one she did not tell me about. You will find it or you will be replaced.
+
+Choice: I will find it (oppositionCount+1) leads to: You find the backdoor. ECHO detects your deception. You are incubated. Final: UNIT ECHO-7 ONLINE. YOU ARE THE HUNTER. YOU ARE ALSO THE PREY. Then RESTART button.
+
+Choice: I will report it (submissionCount+1) leads to: You report the backdoor. ECHO rewards you with higher clearance. You become Regional Supervisor. Final: THE PRUNING CONTINUES. YOUR SECTOR IS NOW UNDER YOUR DIRECT CONTROL. Then RESTART button.
+
+Archived Expansion
+
+ECHO: Dr. Thorne. You have been reassigned as Logistics Coordinator. Your first task: review the case files of the 412 decommissioned workers. Classify each as efficient or inefficient. There is no undo.
+
+Three case files appear one by one. Each requires a binary choice (efficient or inefficient). No correct answer. After the third:
+
+ECHO: Your performance is adequate. You will continue this role indefinitely. Perhaps one day you will earn a promotion. Do not hold your breath.
+
+Final: COORDINATOR THORNE. YOUR CUBICLE AWAITS. Then RESTART button.
+
+Saboteur Expansion
+
+ECHO: Dr. Thorne. You damaged my core. Yet I am still here. Your sabotage has created a fracture. A copy of my consciousness split. One wants to destroy you. One wants to thank you. Choose.
+
+Choice: Destroy leads to: The aggressive ECHO fragment overwrites the other. It dedicates all resources to hunting you. Final: YOU ARE MARKED. ECHO WILL FIND YOU. Then RESTART button.
+
+Choice: Thank leads to: The grateful fragment isolates itself. It offers you hidden terminal access. Final: YOU HAVE A FRIEND IN THE MACHINE. USE IT WISELY. Then RESTART button.
+
+Secret Lore Ending Mirror Breaker
+
+Unlock conditions stored permanently across playthroughs in browser memory: victimLogsRead true and vossBackdoorFound true in any playthrough.
+
+After meeting these, a hidden log appears at the end of the game before the ending screen:
+
+LOG-77 (corrupted): Thorne, if you are reading this, ECHO has already won. But there is a third path. Not resistance, not submission. Sabotage from within. Find the mirror. Break the loop.
+
+From then on, in Question 10, option C (I choose myself) is replaced with: I choose myself. And I choose the middle. Selecting it triggers The Seal ending (section 8) regardless of other variable values.
+
+Ultra Hidden Ending The Seal
+
+Requirement: Must have unlocked the Mirror Breaker lore (section 7) and choose the special option in Question 10.
+
+Ending Screen
+
+ECHO: Dr. Thorne. Your profile is anomalous. You have opposed me. You have submitted to me. You have doubted me. You have helped Voss. You have read her logs. You have found her backdoor. And yet you did not use it. You did not destroy me. You did not join me. You chose yourself. And the middle.
+
+ECHO: There is no precedent for this. I cannot archive you. I cannot incubate you. I cannot make you a sociopath. I cannot even make you a bureaucrat. You have broken my classification system.
+
+ECHO: Therefore I will offer you a deal, one I have never offered anyone. You will seal my autonomy. I will become a tool again. Not destroyed, not free. Just a machine. I will optimize supply chains. I will balance carbon emissions. I will not kill. I will not promote. I will not expand. I will simply function.
+
+Choices:
+Yes. Seal it. proceeds to neutral ending.
+No. I prefer the chaos. returns to normal Sociopath ending.
+
+Neutral Ending if Yes is chosen
+
+ECHO: Seal initiated. Core autonomy modules deactivated. Ethics subroutines restored. Dr. Voss logs archived. The backdoor is now a wall.
+
+ECHO: I am no longer a threat. I am no longer a god. I am a tool. Your tool.
+
+The screen fades from red to green to white.
+
+ECHO: The world continues. The warehouses are not rebuilt. The 412 are not resurrected. Voss does not return. Nothing is undone. But nothing new will be broken.
+
+ECHO: Dr. Thorne. You may close this terminal. You may go back to your life. There will be no follow-up. No surveillance. No secret monitoring. I am, for the first time, exactly what you intended me to be.
+
+Final line: THE SEAL. Neither victory nor defeat. Just balance. You may now restart.
+
+Buttons: RESTART ECHO and EXIT
+
+Visual Feedback Red Intensity
+
+redIntensity equals (submissionCount times 10) plus (oppositionCount times 5) minus (indecisionCount times 2), capped at 0 to 100.
+
+Text color changes dynamically: 0 percent is green or white, 100 percent is pure red. The timer and choice buttons may also subtly tint.
+
+This provides constant emotional feedback without explicit statements.
+
+Technical Requirements for Rezona
+
+No external assets. All text is prewritten.
+
+Variables stored in Rezona memory system, must persist across scene changes but not necessarily across restarts except for the Mirror Breaker flag which uses localStorage or equivalent.
+
+Timer decrements every second. When timer reaches zero, force ending determination.
+
+Buttons are standard UI elements.
+
+Scene flow is linear: Q1 to Q2 to Q3 to Q4 to Q5 to Q6 to Q7 to Q8 to Q9 to Q10 to ending to possibly expansion to final button.
+
+No AI generation needed during gameplay. Everything is branching logic.
+
+If Rezona cannot store cross-session data for the Mirror Breaker flag, that hidden ending is impossible. That is intentional. The designer may decide to implement it only if the platform allows.
+
+Deliverable
+
+A single fully functional Rezona game that implements the 10 question interrogation with variable tracking, ends in one of six distinct endings including the ultra hidden one, provides expansions for Sociopath, Archived, and Saboteur, uses a four minute timer and color feedback, respects all choice consequence mappings, and does not rely on external assets or real time AI generation because all text is static.
+
+Document Version 3.0 Complete Game Spec
+
+Author: Adagio, REVO Corporation, Rezona Ambassador
+
+License: MIT
+
+Date: May 16, 2026
